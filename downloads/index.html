@@ -3,89 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baya PiMarket - السيادة الرقمية</title>
+    <title>Baya Pi Dashboard</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <style>
-        :root {
-            --gold: #ffcf4b;
-            --dark-bg: #0a0a0a;
-            --neon-blue: #00f3ff;
-        }
-        body {
-            background-color: var(--dark-bg);
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
-        .vault-core {
-            border: 2px solid var(--gold);
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            background: rgba(20, 20, 20, 0.9);
-            box-shadow: 0 0 30px rgba(255, 207, 75, 0.2);
-            max-width: 400px;
-            width: 90%;
-        }
-        h1 { color: var(--gold); letter-spacing: 5px; margin-bottom: 10px; }
-        .divider { height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 20px 0; }
-        .btn-activate {
-            background: linear-gradient(45deg, var(--gold), #b8860b);
-            border: none;
-            padding: 15px 40px;
-            color: black;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 18px;
-            box-shadow: 0 5px 15px rgba(255, 207, 75, 0.4);
-            transition: 0.3s;
-        }
-        .btn-activate:hover { transform: scale(1.05); box-shadow: 0 0 25px var(--gold); }
-        #status { color: var(--gold); margin-top: 20px; font-size: 14px; opacity: 0.8; }
+        :root { --gold: #ffcf4b; --dark: #0a0a0a; --gray: #1a1a1a; }
+        body { background: var(--dark); color: white; font-family: sans-serif; margin: 0; padding: 20px; }
+        .hidden { display: none; }
+        .card { background: var(--gray); border: 1px solid var(--gold); border-radius: 15px; padding: 20px; margin-bottom: 15px; text-align: center; }
+        .balance { font-size: 2.5rem; color: var(--gold); margin: 10px 0; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { background: var(--gold); color: black; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; }
+        .status-bar { font-size: 0.8rem; color: #888; margin-top: 10px; }
+        h2 { color: var(--gold); border-bottom: 1px solid var(--gold); padding-bottom: 5px; }
     </style>
 </head>
 <body>
 
-<div class="vault-core">
+<div id="login-section" class="card">
     <h1>BAYA PI</h1>
     <p>قلعة الحشاشين الرقمية</p>
-    <div class="divider"></div>
-    
-    <div id="lock-screen">
-        <button class="btn-activate" onclick="launchSovereignty()">دخول الملوك 🔴</button>
-        <p id="status">الحالة: في انتظار إشارة البدء...</p>
+    <button class="btn" onclick="login()">دخول الملوك 🔴</button>
+    <p id="msg" class="status-bar">بانتظار الإشارة...</p>
+</div>
+
+<div id="dashboard" class="hidden">
+    <div class="card">
+        <h2>أهلاً بالقائد <span id="user-name">...</span></h2>
+        <p>إجمالي الرصيد المتاح</p>
+        <div class="balance">574.25 π</div>
+        <div class="grid">
+            <button class="btn" onclick="alert('جاري تشفير عملية السحب...')">سحب الأرباح</button>
+            <button class="btn" style="background:#444; color:white;" onclick="alert('الرادار يراقب الأسواق...')">الرادار</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>رادار الأسواق الحية</h3>
+        <div style="text-align:right; font-size: 0.9rem;">
+            <p>BTC/USD: <span style="color:#00ff00;">$64,231.50 ▲</span></p>
+            <p>PI/USD: <span style="color:var(--gold);">$314.159 (تقديري)</span></p>
+        </div>
     </div>
 </div>
 
 <script>
-    // تهيئة نظام Pi باستخدام المعرف الجديد الخاص بـ security-scanner
     const Pi = window.Pi;
     Pi.init({ version: "2.0", sandbox: false });
 
-    async function launchSovereignty() {
+    async function login() {
         try {
-            document.getElementById('status').innerText = "جاري فك تشفير الهوية...";
+            document.getElementById('msg').innerText = "جاري فتح الأبواب...";
+            const auth = await Pi.authenticate(['username'], (p) => {});
             
-            const scopes = ['username', 'payments'];
-            function onIncompletePaymentFound(payment) { /* لمعالجة المدفوعات لاحقاً */ }
-
-            const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
+            // إخفاء الدخول وإظهار اللوحة
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('user-name').innerText = auth.user.username;
             
-            document.getElementById('status').innerText = "مرحباً بالقائد: " + auth.user.username;
-            alert("تم إثبات الولاء.. أهلاً بك في العرش يا " + auth.user.username);
-            
-        } catch (err) {
-            document.getElementById('status').innerText = "خطأ في الاتصال بالشبكة..";
-            console.error(err);
+        } catch (e) {
+            document.getElementById('msg').innerText = "خطأ: ادخل عبر متصفح Pi";
         }
     }
 </script>
-
 </body>
 </html>
