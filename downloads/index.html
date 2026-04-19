@@ -3,67 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baya Pi Dashboard</title>
+    <title>BAYA PI | القلعة</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <style>
-        :root { --gold: #ffcf4b; --dark: #0a0a0a; --gray: #1a1a1a; }
-        body { background: var(--dark); color: white; font-family: sans-serif; margin: 0; padding: 20px; }
+        body { background: #0a0a0a; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .card { border: 2px solid #ffcf4b; border-radius: 15px; padding: 20px; background: #1a1a1a; box-shadow: 0 0 20px #ffcf4b33; margin-top: 50px; }
+        .gold { color: #ffcf4b; }
+        .btn { background: #ffcf4b; color: black; border: none; padding: 15px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1.2rem; transition: 0.3s; }
+        .btn:hover { background: #e6b842; }
         .hidden { display: none; }
-        .card { background: var(--gray); border: 1px solid var(--gold); border-radius: 15px; padding: 20px; margin-bottom: 15px; text-align: center; }
-        .balance { font-size: 2.5rem; color: var(--gold); margin: 10px 0; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn { background: var(--gold); color: black; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; }
-        .status-bar { font-size: 0.8rem; color: #888; margin-top: 10px; }
-        h2 { color: var(--gold); border-bottom: 1px solid var(--gold); padding-bottom: 5px; }
+        .balance { font-size: 3rem; margin: 20px 0; color: #ffcf4b; text-shadow: 0 0 10px #ffcf4b; }
     </style>
 </head>
 <body>
 
-<div id="login-section" class="card">
-    <h1>BAYA PI</h1>
-    <p>قلعة الحشاشين الرقمية</p>
-    <button class="btn" onclick="login()">دخول الملوك 🔴</button>
-    <p id="msg" class="status-bar">بانتظار الإشارة...</p>
-</div>
+    <div id="login-section" class="card">
+        <h1 class="gold">BAYA PI</h1>
+        <p>نظام الحشاشين السيادي</p>
+        <button class="btn" onclick="login()">دخول الملوك 👑</button>
+        <p id="status" style="font-size: 0.8rem; color: #666; margin-top: 15px;">بانتظار الإشارة الماسية...</p>
+    </div>
 
-<div id="dashboard" class="hidden">
-    <div class="card">
-        <h2>أهلاً بالقائد <span id="user-name">...</span></h2>
-        <p>إجمالي الرصيد المتاح</p>
+    <div id="dashboard" class="hidden card">
+        <h2 class="gold">أهلاً بالقائد <span id="user-name">...</span></h2>
+        <p>رصيد Pi المتاح في القلعة:</p>
         <div class="balance">574.25 π</div>
-        <div class="grid">
-            <button class="btn" onclick="alert('جاري تشفير عملية السحب...')">سحب الأرباح</button>
-            <button class="btn" style="background:#444; color:white;" onclick="alert('الرادار يراقب الأسواق...')">الرادار</button>
-        </div>
+        <button class="btn" style="background: #333; color: white;">رادار الأسواق نشط الآن</button>
     </div>
 
-    <div class="card">
-        <h3>رادار الأسواق الحية</h3>
-        <div style="text-align:right; font-size: 0.9rem;">
-            <p>BTC/USD: <span style="color:#00ff00;">$64,231.50 ▲</span></p>
-            <p>PI/USD: <span style="color:var(--gold);">$314.159 (تقديري)</span></p>
-        </div>
-    </div>
-</div>
+    <script>
+        const Pi = window.Pi;
+        // تفعيل وضع الاختبار لضمان فتح الأبواب
+        Pi.init({ version: "2.0", sandbox: true });
 
-<script>
-    const Pi = window.Pi;
-    Pi.init({ version: "2.0", sandbox:true });
-
-    async function login() {
-        try {
-            document.getElementById('msg').innerText = "جاري فتح الأبواب...";
-            const auth = await Pi.authenticate([], (p) => {});
-            
-            // إخفاء الدخول وإظهار اللوحة
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('dashboard').classList.remove('hidden');
-            document.getElementById('user-name').innerText = auth.user.username;
-            
-        } catch (e) {
-            document.getElementById('msg').innerText = "خطأ: ادخل عبر متصفح Pi";
+        async function login() {
+            const status = document.getElementById('status');
+            try {
+                status.innerText = "جاري فتح الأبواب...";
+                const auth = await Pi.authenticate(['username'], (p) => {});
+                
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                document.getElementById('user-name').innerText = auth.user.username;
+            } catch (e) {
+                status.innerText = "ادخل عبر متصفح Pi لتفعيل صلاحياتك";
+                console.error(e);
+            }
         }
-    }
-</script>
+    </script>
 </body>
 </html>
