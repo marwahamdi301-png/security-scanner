@@ -1,56 +1,33 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BAYA PI | القلعة</title>
+    <title>Pi Marketplace - Baya</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <style>
-        body { background: #0a0a0a; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .card { border: 2px solid #ffcf4b; border-radius: 15px; padding: 20px; background: #1a1a1a; box-shadow: 0 0 20px #ffcf4b33; margin-top: 50px; }
-        .gold { color: #ffcf4b; }
-        .btn { background: #ffcf4b; color: black; border: none; padding: 15px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1.2rem; transition: 0.3s; }
-        .btn:hover { background: #e6b842; }
-        .hidden { display: none; }
-        .balance { font-size: 3rem; margin: 20px 0; color: #ffcf4b; text-shadow: 0 0 10px #ffcf4b; }
-    </style>
 </head>
 <body>
-
-    <div id="login-section" class="card">
-        <h1 class="gold">BAYA PI</h1>
-        <p>نظام الحشاشين السيادي</p>
-        <button class="btn" onclick="login()">دخول الملوك 👑</button>
-        <p id="status" style="font-size: 0.8rem; color: #666; margin-top: 15px;">بانتظار الإشارة الماسية...</p>
-    </div>
-
-    <div id="dashboard" class="hidden card">
-        <h2 class="gold">أهلاً بالقائد <span id="user-name">...</span></h2>
-        <p>رصيد Pi المتاح في القلعة:</p>
-        <div class="balance">574.25 π</div>
-        <button class="btn" style="background: #333; color: white;">رادار الأسواق نشط الآن</button>
-    </div>
-
+    <h1>مرحباً بك في إمبراطورية بايا</h1>
+    <div id="products">
+        </div>
     <script>
         const Pi = window.Pi;
-        // تفعيل وضع الاختبار لضمان فتح الأبواب
         Pi.init({ version: "2.0", sandbox: true });
 
-        async function login() {
-            const status = document.getElementById('status');
+        async function makePayment(price) {
             try {
-                status.innerText = "جاري فتح الأبواب...";
-                const auth = await Pi.authenticate(['username'], (p) => {});
-                
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('dashboard').classList.remove('hidden');
-                document.getElementById('user-name').innerText = auth.user.username;
-            } catch (e) {
-                status.innerText = "ادخل عبر متصفح Pi لتفعيل صلاحياتك";
-                console.error(e);
+                const payment = await Pi.createPayment({
+                    amount: price,
+                    memo: "شراء بوت التنبيهات من سوق بايا",
+                    metadata: { productId: "whale-bot-01" }
+                }, {
+                    onReadyForServerApproval: (paymentId) => { /* سيتم ربطه بـ السيرفر */ },
+                    onReadyForServerCompletion: (paymentId, txid) => { /* اكتمل الدفع */ },
+                    onCancel: (paymentId) => { console.log("تم إلغاء العملية"); },
+                    onError: (error, payment) => { console.error("خطأ!", error); }
+                });
+            } catch (err) {
+                console.error(err);
             }
         }
     </script>
 </body>
 </html>
- 
